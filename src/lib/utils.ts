@@ -1,56 +1,36 @@
-import { ClassValue, clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
-import { formatDistanceToNowStrict } from 'date-fns'
-import locale from 'date-fns/locale/en-US'
-
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
+ 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-const formatDistanceLocale = {
-  lessThanXSeconds: 'just now',
-  xSeconds: 'just now',
-  halfAMinute: 'just now',
-  lessThanXMinutes: '{{count}}m',
-  xMinutes: '{{count}}m',
-  aboutXHours: '{{count}}h',
-  xHours: '{{count}}h',
-  xDays: '{{count}}d',
-  aboutXWeeks: '{{count}}w',
-  xWeeks: '{{count}}w',
-  aboutXMonths: '{{count}}m',
-  xMonths: '{{count}}m',
-  aboutXYears: '{{count}}y',
-  xYears: '{{count}}y',
-  overXYears: '{{count}}y',
-  almostXYears: '{{count}}y',
-}
 
-function formatDistance(token: string, count: number, options?: any): string {
-  options = options || {}
+export function formatDistanceSimple(date: Date, options?: any): string {
+  options = options || {};
+  const now = new Date();
+  //@ts-ignore
+  const timeDifferenceInSeconds = Math.floor((now - date) / 1000);
 
-  const result = formatDistanceLocale[
-    token as keyof typeof formatDistanceLocale
-  ].replace('{{count}}', count.toString())
-
-  if (options.addSuffix) {
-    if (options.comparison > 0) {
-      return 'in ' + result
-    } else {
-      if (result === 'just now') return result
-      return result + ' ago'
-    }
+  if (timeDifferenceInSeconds < 60) {
+    return 'just now';
+  } else if (timeDifferenceInSeconds < 3600) {
+    const minutes = Math.floor(timeDifferenceInSeconds / 60);
+    return `${minutes}m${options.addSuffix ? (options.comparison > 0 ? ' in' : ' ago') : ''}`;
+  } else if (timeDifferenceInSeconds < 86400) {
+    const hours = Math.floor(timeDifferenceInSeconds / 3600);
+    return `${hours}h${options.addSuffix ? (options.comparison > 0 ? ' in' : ' ago') : ''}`;
+  } else if (timeDifferenceInSeconds < 604800) {
+    const days = Math.floor(timeDifferenceInSeconds / 86400);
+    return `${days}d${options.addSuffix ? (options.comparison > 0 ? ' in' : ' ago') : ''}`;
+  } else if (timeDifferenceInSeconds < 2419200) {
+    const weeks = Math.floor(timeDifferenceInSeconds / 604800);
+    return `${weeks}w${options.addSuffix ? (options.comparison > 0 ? ' in' : ' ago') : ''}`;
+  } else if (timeDifferenceInSeconds < 29030400) {
+    const months = Math.floor(timeDifferenceInSeconds / 2419200);
+    return `${months}m${options.addSuffix ? (options.comparison > 0 ? ' in' : ' ago') : ''}`;
+  } else {
+    const years = Math.floor(timeDifferenceInSeconds / 29030400);
+    return `${years}y${options.addSuffix ? (options.comparison > 0 ? ' in' : ' ago') : ''}`;
   }
-
-  return result
-}
-
-export function formatTimeToNow(date: Date): string {
-  return formatDistanceToNowStrict(date, {
-    addSuffix: true,
-    locale: {
-      ...locale,
-      formatDistance,
-    },
-  })
 }
