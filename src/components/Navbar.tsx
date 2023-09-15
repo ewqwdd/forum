@@ -4,6 +4,7 @@ import { buttonVariants } from "./ui/Button"
 import { getServerSession } from "next-auth"
 import UserAccountNav from "./UserAccountNav"
 import SearchBar from "./SearchBar"
+import { cn } from "@/lib/utils"
 
 const Navbar = async()=>{
 
@@ -25,7 +26,7 @@ const Navbar = async()=>{
                 
                 {session?.user ? 
                     <UserAccountNav user={session.user}/>: 
-                    <Link href="/sign-in" className={buttonVariants()}>Sign In</Link>
+                    <Link href="/sign-in" className={cn(buttonVariants(), "w-16 sm:w-20")}>Sign In</Link>
                 }
                 
             </div>
